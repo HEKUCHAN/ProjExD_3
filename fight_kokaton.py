@@ -65,18 +65,19 @@ class Bird:
         pg.K_LEFT: (-5, 0),
         pg.K_RIGHT: (+5, 0),
     }
-    img0 = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
-    img = pg.transform.flip(img0, True, False)  # デフォルトのこうかとん（右向き）
+    img_flip = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    img = pg.transform.flip(img_flip, True, False)  # デフォルトのこうかとん（右向き）
     imgs = {  # 0度から反時計回りに定義
         (+5, 0): img,  # 右
         (+5, -5): pg.transform.rotozoom(img, 45, 0.9),  # 右上
         (0, -5): pg.transform.rotozoom(img, 90, 0.9),  # 上
-        (-5, -5): pg.transform.rotozoom(img0, -45, 0.9),  # 左上
-        (-5, 0): img0,  # 左
-        (-5, +5): pg.transform.rotozoom(img0, 45, 0.9),  # 左下
+        (-5, -5): pg.transform.rotozoom(img_flip, -45, 0.9),  # 左上
+        (-5, 0): img_flip,  # 左
+        (-5, +5): pg.transform.rotozoom(img_flip, 45, 0.9),  # 左下
         (0, +5): pg.transform.rotozoom(img, -90, 0.9),  # 下
         (+5, +5): pg.transform.rotozoom(img, -45, 0.9),  # 右下
     }
+    dire = (+5, 0)
 
     def __init__(self, xy: tuple[int, int]):
         """
@@ -107,6 +108,9 @@ class Bird:
             if key_lst[k]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
+        if sum_mv != [0, 0]:
+            self.dire = tuple(sum_mv)
+            self.img = __class__.imgs[tuple(sum_mv)]
         self.rct.move_ip(sum_mv)
         if check_bound(self.rct) != (True, True):
             self.rct.move_ip(-sum_mv[0], -sum_mv[1])
@@ -125,11 +129,22 @@ class Beam:
                 ビーム画像Surfaceを生成する
         #       引数 bird：ビームを放つこうかとん（Birdインスタンス）
         """
-        self.img = pg.image.load("fig/beam.png")
-        self.rct = self.img.get_rect()
-        self.rct.centerx = bird.rct.centerx
-        self.rct.centery = bird.rct.centery
-        self.vx, self.vy = +5, 0
+        img = pg.image.load("fig/beam.png")
+        img_flip = pg.transform.flip(img, True, False)
+        self.imgs = {  # 0度から反時計回りに定義
+            (+5, 0): img,  # 右
+            (+5, -5): pg.transform.rotozoom(img, 45, 0.9),  # 右上
+            (0, -5): pg.transform.rotozoom(img, 90, 0.9),  # 上
+            (-5, -5): pg.transform.rotozoom(img_flip, -45, 0.9),  # 左上
+            (-5, 0): img_flip,  # 左
+            (-5, +5): pg.transform.rotozoom(img_flip, 45, 0.9),  # 左下
+            (0, +5): pg.transform.rotozoom(img, -90, 0.9),  # 下
+            (+5, +5): pg.transform.rotozoom(img, -45, 0.9),  # 右下
+        }
+        self.rct = img.get_rect()
+        self.vx, self.vy = bird.dire
+        self.rct.centerx = bird.rct.centerx + bird.rct.width * self.vx / 5
+        self.rct.centery = bird.rct.centery + bird.rct.height * self.vy / 5
 
     def update(self, screen: pg.Surface):
         """
@@ -137,8 +152,9 @@ class Beam:
         引数 screen：画面Surface
         """
         if check_bound(self.rct) == (True, True):
+            img = self.imgs[(self.vx, self.vy)]
             self.rct.move_ip(self.vx, self.vy)
-            screen.blit(self.img, self.rct)
+            screen.blit(img, self.rct)
 
 
 class Bomb:
