@@ -180,15 +180,16 @@ def main():
     score = Score()
     bird = Bird((300, 200))
     bombs: list[Bomb | None] = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
+    beams: list[Beam | None] = []
     clock = pg.time.Clock()
     tmr = 0
-    beam = None
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beam = Beam(bird)
+                beams.append(beam)
         screen.blit(bg_img, [0, 0])
 
         bombs = [bomb for bomb in bombs if bomb is not None]
@@ -214,15 +215,23 @@ def main():
                     pg.display.update()
                     game_over_clock.tick(50)
 
-            if beam is not None and beam.rct.colliderect(bomb.rct):
-                bombs[i] = None
-                beam = None
-                score.add_score(1)
-                bird.change_img(6, screen)
-                pg.display.update()
-                time.sleep(1)
-                bird.change_img(3, screen)
-                pg.display.update()
+            for j, beam in enumerate(beams):
+                if beam is None:
+                    continue
+
+                if not any(check_bound(beam.rct)):
+                    beams[j] = None
+
+                if beam.rct.colliderect(bomb.rct):
+                    bombs[i] = None
+                    beams[j] = None
+                    score.add_score(1)
+                    bird.change_img(6, screen)
+                    pg.display.update()
+                    time.sleep(1)
+                    bird.change_img(3, screen)
+                    pg.display.update()
+                    break
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
@@ -231,8 +240,9 @@ def main():
             if bomb is not None:
                 bomb.update(screen)
 
-        if beam is not None:
-            beam.update(screen)
+        for beam in beams:
+            if beam is not None:
+                beam.update(screen)
 
         score.update(screen)
 
