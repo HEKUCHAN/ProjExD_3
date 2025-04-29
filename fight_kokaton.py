@@ -190,7 +190,17 @@ def main():
             bird.change_img(8, screen)
             pg.display.update()
             time.sleep(1)
-            return
+
+            game_over_clock = pg.time.Clock()
+            while True:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        return
+                font = pg.font.Font(None, 80)
+                txt = font.render("Game Over", True, (255, 0, 0))
+                screen.blit(txt, [WIDTH//2-150, HEIGHT//2])
+                pg.display.update()
+                game_over_clock.tick(50)
 
         if beam is not None and bomb is not None and beam.rct.colliderect(bomb.rct):
             bomb = None
