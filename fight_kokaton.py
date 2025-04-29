@@ -262,10 +262,14 @@ def main():
                     continue
 
                 if beam.rct.colliderect(bomb.rct):
+                    # ビームと爆弾が衝突した場合
+                    # 爆弾とビームをNoneにして，爆発を生成する
                     bombs[i] = None
                     beams[j] = None
                     explosion = Exprosion(bomb)
                     explosions.append(explosion)
+
+                    # スコアを加算し，こうかとん画像を切り替え，1秒間表示させる
                     score.add_score(1)
                     bird.change_img(6, screen)
                     explosion.update(screen)
@@ -273,6 +277,7 @@ def main():
                     time.sleep(1)
                     bird.change_img(3, screen)
                     pg.display.update()
+
                     break
 
         for i, explosion in enumerate(explosions):
