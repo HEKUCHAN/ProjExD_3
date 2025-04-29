@@ -117,8 +117,8 @@ class Beam:
 
     def __init__(self, bird: "Bird"):
         """
-        ビーム画像Surfaceを生成する
-#       引数 bird：ビームを放つこうかとん（Birdインスタンス）
+                ビーム画像Surfaceを生成する
+        #       引数 bird：ビームを放つこうかとん（Birdインスタンス）
         """
         self.img = pg.image.load("fig/beam.png")
         self.rct = self.img.get_rect()
@@ -134,6 +134,7 @@ class Beam:
         if check_bound(self.rct) == (True, True):
             self.rct.move_ip(self.vx, self.vy)
             screen.blit(self.img, self.rct)
+
 
 class Bomb:
     """
@@ -184,18 +185,22 @@ def main():
                 beam = Beam(bird)
         screen.blit(bg_img, [0, 0])
 
-        if bird.rct.colliderect(bomb.rct):
+        if bomb is not None and bird.rct.colliderect(bomb.rct):
             # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
             bird.change_img(8, screen)
             pg.display.update()
             time.sleep(1)
             return
 
+        if beam is not None and bomb is not None and beam.rct.colliderect(bomb.rct):
+            bomb = None
+
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         if beam is not None:
             beam.update(screen)
-        bomb.update(screen)
+        if bomb is not None:
+            bomb.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
