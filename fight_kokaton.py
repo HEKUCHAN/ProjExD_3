@@ -33,7 +33,7 @@ class Score:
         self.score = 0
         self.img = self.__render_score()
         self.rct = self.img.get_rect()
-        self.rct.center = (100, 50)
+        self.rct.center = (100, HEIGHT - 50)
 
     def __render_score(self) -> pg.Surface:
         return self.font.render(f"スコア: {self.score}", True, self.font_color)
