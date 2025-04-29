@@ -209,6 +209,7 @@ class Exprosion:
         current_frame = (self.life // self.frame_interval) % len(self.imgs)
         screen.blit(self.imgs[current_frame], self.rct)
 
+
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
